@@ -58,54 +58,70 @@ resource "octopusdeploy_tenant" "europe" {
   name        = "Europe"
   description = "Tenant representing the European region Octopus space"
   tenant_tags = ["tenant_type/regional"]
+}
 
-  project_environment {
-    environments = [data.octopusdeploy_environments.development.environments[0].id, data.octopusdeploy_environments.test.environments[0].id, data.octopusdeploy_environments.production.environments[0].id, data.octopusdeploy_environments.sync.environments[0].id]
-    project_id   = data.octopusdeploy_projects.project.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.development.environments[0].id,
+    data.octopusdeploy_environments.test.environments[0].id,
+    data.octopusdeploy_environments.production.environments[0].id,
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id   = data.octopusdeploy_projects.project.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
+}
 
-  project_environment {
-    environments = [data.octopusdeploy_environments.development.environments[0].id, data.octopusdeploy_environments.test.environments[0].id, data.octopusdeploy_environments.production.environments[0].id, data.octopusdeploy_environments.sync.environments[0].id]
-    project_id   = data.octopusdeploy_projects.project_cac.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_cac_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.development.environments[0].id,
+    data.octopusdeploy_environments.test.environments[0].id,
+    data.octopusdeploy_environments.production.environments[0].id,
+    data.octopusdeploy_environments.sync.environments[0].id]
+  project_id   = data.octopusdeploy_projects.project_cac.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
+}
 
-  project_environment {
-    environments = [
-      data.octopusdeploy_environments.development.environments[0].id,
-      data.octopusdeploy_environments.test.environments[0].id,
-      data.octopusdeploy_environments.production.environments[0].id,
-      data.octopusdeploy_environments.sync.environments[0].id
-    ]
-    project_id   = data.octopusdeploy_projects.project_web_app_cac.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_web_app_cac_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.development.environments[0].id,
+    data.octopusdeploy_environments.test.environments[0].id,
+    data.octopusdeploy_environments.production.environments[0].id,
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id   = data.octopusdeploy_projects.project_web_app_cac.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
+}
 
-  project_environment {
-    environments = [
-      data.octopusdeploy_environments.sync.environments[0].id
-    ]
-    project_id   = data.octopusdeploy_projects.project_init_space.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_init_space_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id   = data.octopusdeploy_projects.project_init_space.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
+}
 
-  project_environment {
-    environments = [
-      data.octopusdeploy_environments.sync.environments[0].id
-    ]
-    project_id   = data.octopusdeploy_projects.project_init_space_k8s.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_create_client_space_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id   = data.octopusdeploy_projects.project_create_client_space.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
+}
 
-  project_environment {
-    environments = [
-      data.octopusdeploy_environments.sync.environments[0].id
-    ]
-    project_id   = data.octopusdeploy_projects.project_create_client_space.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_k8s_microservice_template_space_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id   = data.octopusdeploy_projects.project_k8s_microservice_template.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
+}
 
-  project_environment {
-    environments = [
-      data.octopusdeploy_environments.sync.environments[0].id
-    ]
-    project_id   = data.octopusdeploy_projects.project_k8s_microservice_template.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "europe_project_init_space_k8s_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id   = data.octopusdeploy_projects.project_init_space_k8s.projects[0].id
+  tenant_id  = octopusdeploy_tenant.europe.id
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_octopus_apikey" {
@@ -113,6 +129,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_octopus_apikey" {
   template_id = tolist([for tmp in data.octopusdeploy_library_variable_sets.octopus_server.library_variable_sets[0].template : tmp.id if tmp.name == "ManagedTenant.Octopus.ApiKey"])[0]
   tenant_id = octopusdeploy_tenant.europe.id
   value = "API-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_octopus_spaceid" {
@@ -120,6 +145,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_octopus_spaceid" {
   template_id = tolist([for tmp in data.octopusdeploy_library_variable_sets.octopus_server.library_variable_sets[0].template : tmp.id if tmp.name == "ManagedTenant.Octopus.Url"])[0]
   tenant_id = octopusdeploy_tenant.europe.id
   value = "http://octopus:8080"
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_azure_application_id" {
@@ -130,6 +164,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_azure_application_id" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_azure_application_id == "" ? var.azure_application_id : var.europe_azure_application_id
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_azure_subscription_id" {
@@ -140,6 +183,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_azure_subscription_id" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_azure_subscription_id == "" ? var.azure_subscription_id : var.europe_azure_subscription_id
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_azure_tenant_id" {
@@ -150,6 +202,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_azure_tenant_id" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_azure_tenant_id== "" ? var.azure_tenant_id : var.europe_azure_tenant_id
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_azure_password" {
@@ -160,6 +221,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_azure_password" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_azure_password == "" ? var.azure_password : var.europe_azure_password
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_k8s_cert" {
@@ -170,6 +240,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_k8s_cert" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_k8s_cert
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_k8s_url" {
@@ -180,6 +259,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_k8s_url" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_k8s_url
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_docker_username" {
@@ -190,6 +278,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_docker_username" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_docker_username == "" ? var.docker_username : var.europe_docker_username
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_docker_password" {
@@ -200,6 +297,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_docker_password" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.europe_docker_password == "" ? var.docker_password : var.europe_docker_password
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_slack_bot_token" {
@@ -210,6 +316,15 @@ resource "octopusdeploy_tenant_common_variable" "europe_slack_bot_token" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.slack_bot_token
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }
 
 resource "octopusdeploy_tenant_common_variable" "europe_slack_support_users" {
@@ -220,4 +335,13 @@ resource "octopusdeploy_tenant_common_variable" "europe_slack_support_users" {
   ])[0]
   tenant_id               = octopusdeploy_tenant.europe.id
   value                   = var.slack_support_users
+  depends_on = [
+    octopusdeploy_tenant_project.europe_project_environment,
+    octopusdeploy_tenant_project.europe_project_cac_environment,
+    octopusdeploy_tenant_project.europe_project_web_app_cac_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_environment,
+    octopusdeploy_tenant_project.europe_project_create_client_space_environment,
+    octopusdeploy_tenant_project.europe_project_k8s_microservice_template_space_environment,
+    octopusdeploy_tenant_project.europe_project_init_space_k8s_environment,
+  ]
 }

@@ -2,13 +2,14 @@ resource "octopusdeploy_tenant" "test_prod" {
   name        = "Test\\Production"
   description = "Tenant representing the test and production Octopus instance"
   tenant_tags = []
+}
 
-  project_environment {
-    environments = [
-      data.octopusdeploy_environments.sync.environments[0].id
-    ]
-    project_id   = data.octopusdeploy_projects.project.projects[0].id
-  }
+resource "octopusdeploy_tenant_project" "test_prod_project_environment" {
+  environment_ids = [
+    data.octopusdeploy_environments.sync.environments[0].id
+  ]
+  project_id      = data.octopusdeploy_projects.project.projects[0].id
+  tenant_id       = octopusdeploy_tenant.test_prod.id
 }
 
 resource "octopusdeploy_tenant_common_variable" "octopus_apikey" {

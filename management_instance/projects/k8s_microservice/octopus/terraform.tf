@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "0.14.4" }
+    octopusdeploy = { source = "OctopusDeployLabs/octopusdeploy", version = "0.22.0" }
   }
 }
 
@@ -339,6 +339,7 @@ EOT
         "Octopus.Action.KubernetesContainers.DeploymentResourceType"        = "Deployment"
         "Octopus.Action.KubernetesContainers.PodSecurityRunAsGroup"         = "#{if Kubernetes.Security.PodSecurityRunAsGroup}#{Kubernetes.Security.PodSecurityRunAsGroup}#{/if}"
         "Octopus.Action.KubernetesContainers.PodSecurityRunAsUser"          = "#{if Kubernetes.Security.PodSecurityRunAsUser}#{Kubernetes.Security.PodSecurityRunAsUser}#{/if}"
+        "Octopus.Action.Kubernetes.ResourceStatusCheck"                     = "False"
         "Octopus.Action.KubernetesContainers.DeploymentWait"                = "Wait"
         "Octopus.Action.KubernetesContainers.DeploymentStyle"               = "RollingUpdate"
         "Octopus.Action.KubernetesContainers.Namespace"                     = "#{Kubernetes.Deployment.Namespace}"
