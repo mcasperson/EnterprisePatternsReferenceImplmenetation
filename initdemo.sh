@@ -85,11 +85,17 @@ then
     exit 1
   fi
 
-  if ! which octo
+  if ! (which octo || which dotnet-octo)
   then
     echo "You must install the Octopus CLI"
     exit 1
   fi
+fi
+
+OCTOCLI=octo
+if which dotnet-octo
+then
+  OCTOCLI=dotnet-octo
 fi
 
 # We know these test credentials, so hard code them
@@ -876,14 +882,14 @@ then
   # Create the ArgoCD template and push it to Octopus
   pushd argocd/template || exit 1
   zip -r argocd_template.1.0.0.zip .
-  octo push --server=http://localhost:18080 --apiKey=API-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -space=Spaces-4 --package=argocd_template.1.0.0.zip --replace-existing
+  ${OCTOCLI} push --server=http://localhost:18080 --apiKey=API-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -space=Spaces-4 --package=argocd_template.1.0.0.zip --replace-existing
   rm argocd_template.1.0.0.zip
   popd || exit 1
 
   # Create the ArgoCD project Terraform module package and push it to Octopus
   pushd argocd_dashboard/projects || exit 1
   zip -r argocd_octopus_projects.1.0.0.zip . -i '*.tf' '*.sh'
-  octo push --server=http://localhost:18080 --apiKey=API-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -space=Spaces-4 --package=argocd_octopus_projects.1.0.0.zip --replace-existing
+  ${OCTOCLI} push --server=http://localhost:18080 --apiKey=API-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -space=Spaces-4 --package=argocd_octopus_projects.1.0.0.zip --replace-existing
   rm argocd_octopus_projects.1.0.0.zip
   popd || exit 1
 
